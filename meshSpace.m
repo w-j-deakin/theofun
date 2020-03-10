@@ -103,7 +103,7 @@ classdef meshSpace
             
             for i = 1:nM
                 [I,J] = obj.vec2grid(i);
-                if obj.isMeshed(I,J)
+                if ~obj.isMeshed(I,J)
                     if i == 1
                         vms = vertcat(nan,vms);
                     else
@@ -164,7 +164,7 @@ classdef meshSpace
             
             for i = 1:nM
                 [I,J] = obj.vec2grid(i);
-                if obj.isMeshed(I,J)
+                if ~obj.isMeshed(I,J)
                     if i == 1
                         v = vertcat(nan,v);
                         RI = vertcat(nan,RI);
