@@ -221,7 +221,7 @@ classdef taxaSet
             for i = 1:nC
                 x = group(i).scores(:,ax1PC);
                 y = group(i).scores(:,ax2PC);
-%                 pts(i) = plot(x,y,Sym{i},'MarkerFaceColor',col(i,:),'MarkerEdgeColor',col(i,:)*0.8,'MarkerSize',Sz(i));
+                pts(i) = plot(x,y,Sym{i},'MarkerFaceColor',col(i,:),'MarkerEdgeColor',col(i,:)*0.8,'MarkerSize',Sz(i));
                 hold on
             end
             
