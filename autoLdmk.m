@@ -79,8 +79,13 @@ while(~isComplete)
     end
 end
 
-% Downsample co-prdinates to n
+% Downsample co-ordinates to n
 [nPix,~] = size(pix);
+
+if nPix < n
+    S = ['Image outline does not have enough pixels (', num2str(nPix), ') for specified number of landmarks (', num2str(n), ')']
+    error(S);
+end
 
 res = nPix/n;
 
