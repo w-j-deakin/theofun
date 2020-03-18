@@ -13,15 +13,15 @@ k = 0;
 isSearching = true;
 
 while(isSearching)
-    if xS >= imgH
+    if xS >= imgW
         k = k + 1;
         xS = 2 + k;
     end
-    if yS >= imgW
+    if yS >= imgH
         k = k + 1;
         yS = 2 + k;
     end
-    if img(xS,yS) == 0
+    if img(yS,xS) == 0
         isSearching = false;
     else
         xS = xS + 1;
