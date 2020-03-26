@@ -17,26 +17,28 @@ dir = 0;
 
 k = 0;
 
-visited = zeros(xmax,ymax);
+border = 500;
 
-visited(x,y) = 1;
+visited = zeros(xmax + border , ymax + border);
+
+visited(x + border/2 , y + border/2) = 1;
 
 while k == 0   
     if dir == 0
         y = y + 1;
-        visited(x,y) = 1;
+        visited(x + border/2 , y + border/2) = 1;
         dir = 1;
     elseif dir == 1
         x = x + 1;
-        visited(x,y) = 1;
+        visited(x + border/2 , y + border/2) = 1;
         dir = 2;
     elseif dir == 2
         y = y - 1;
-        visited(x,y) = 1;
+        visited(x + border/2 , y + border/2) = 1;
         dir = 3;
     elseif dir == 3
         x = x - 1;
-        visited(x,y) = 1;
+        visited(x + border/2 , y + border/2) = 1;
         dir = 0;
     else
         error('Direction Bug');
@@ -65,7 +67,7 @@ while k == 0
         error('Direction Bug');
     end
     
-    if visited(x1,y1) == 1
+    if visited(x1 + border/2 , y1 + border/2) == 1
        if dir == 0
            dir = 3;
        elseif dir == 1
