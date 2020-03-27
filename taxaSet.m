@@ -199,23 +199,25 @@ classdef taxaSet
                 isFilled = true;
             end
 
-            Sym = {'ko'; 'ks'; 'kd'; 'k^'; 'kv'};
-            Sz = [3 3 3 3 3];
+            Sym = {'ko'; 'ks'; 'kd'; 'k^'; 'kv'; 'ko'; 'ks'; 'kd'; 'k^'; 'kv'; 'ko'; 'ks'; 'kd'; 'k^'; 'kv'; 'ko'; 'ks'; 'kd'; 'k^'; 'kv'};
+            Sz = [3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3];
             [group, nC, col] = obj.totalCladeSplit;
             
             for i = 1:nC
                 x = group(i).scores(:,ax1PC);
                 y = group(i).scores(:,ax2PC);
                 
-                ch = convhull(x,y);
+                if length(x) > 3
+                    ch = convhull(x,y);
                 
-                if isFilled
-                    fill(x(ch),y(ch),col(i,:),'FaceAlpha',0.2);
-                else
-                    fill(x(ch),y(ch),col(i,:),'FaceAlpha',0);
+                    if isFilled
+                        fill(x(ch),y(ch),col(i,:),'FaceAlpha',0.2);
+                    else
+                        fill(x(ch),y(ch),col(i,:),'FaceAlpha',0);
+                    end
                 end
                 hold on
-                plot(x(ch),y(ch),Sym{i},'MarkerFaceColor',col(i,:),'MarkerSize',Sz(i));
+                plot(x,y,Sym{i},'MarkerFaceColor',col(i,:),'MarkerSize',Sz(i));
             end
             
             for i = 1:nC
@@ -225,17 +227,17 @@ classdef taxaSet
                 hold on
             end
             
-%             lgd = legend(pts,obj.cNames);
-%             legend('boxoff');
-%             lgd.FontSize = 10;
-%             lgd.Location = 'eastoutside';
+            lgd = legend(pts,obj.cNames);
+            legend('boxoff');
+            lgd.FontSize = 10;
+            lgd.Location = 'eastoutside';
             
             
-%             xL = ['PC', num2str(ax1PC), ' (', num2str(obj.explained(ax1PC)), '%)'];
-%             yL = ['PC', num2str(ax2PC), ' (', num2str(obj.explained(ax2PC)), '%)'];
-%             
-%             xlabel(xL);
-%             ylabel(yL);
+            xL = ['PC', num2str(ax1PC), ' (', num2str(obj.explained(ax1PC)), '%)'];
+            yL = ['PC', num2str(ax2PC), ' (', num2str(obj.explained(ax2PC)), '%)'];
+            
+            xlabel(xL);
+            ylabel(yL);
             
         end
         
