@@ -92,12 +92,8 @@ classdef shapespace
         
         % plot individual background shapes
         
-        function s = plotGrid(obj,flip,col)
-            tic
+        function s = plotGrid(obj,col)
             if nargin < 2
-                flip = false;
-            end
-            if nargin < 3
                 col = [0.75 0.75 0.75];
             end
             
@@ -107,14 +103,9 @@ classdef shapespace
             for i = 1:obj.Nx
                 for j = 1:obj.Ny
                     I = (i-1)*obj.Ny + j;
-                    if flip
-                        [x,y] = obj.shapes(I).draw(n,obj.Y(j),obj.X(i),s);
-                    else
-                        [x,y] = obj.shapes(I).draw(n,obj.X(i),obj.Y(j),s);
-                    end
+                    [x,y] = obj.shapes(I).draw(n,obj.X(i),obj.Y(j),s);
                     fill(x,y,col,'LineStyle','none');
                     hold on
-%                     text(obj.X(i),obj.Y(j),num2str(I));
                 end
             end
         end

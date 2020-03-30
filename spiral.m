@@ -23,65 +23,77 @@ visited = zeros(xmax + border , ymax + border);
 
 visited(x + border/2 , y + border/2) = 1;
 
-while k == 0   
-    if dir == 0
-        y = y + 1;
-        visited(x + border/2 , y + border/2) = 1;
-        dir = 1;
-    elseif dir == 1
-        x = x + 1;
-        visited(x + border/2 , y + border/2) = 1;
-        dir = 2;
-    elseif dir == 2
-        y = y - 1;
-        visited(x + border/2 , y + border/2) = 1;
-        dir = 3;
-    elseif dir == 3
-        x = x - 1;
-        visited(x + border/2 , y + border/2) = 1;
-        dir = 0;
-    else
-        error('Direction Bug');
-    end
-    
-    if x > 0 && xmax > x && y > 0 && ymax > y        
-        if img(y,x) == 0 && excl(x,y) == 0
-            k = 1;
-            break
+while k == 0
+    if x + border/2 > 1 && x + border/2 < xmax+border && y + border/2 > 1 && y + border/2 < ymax+border
+        if dir == 0
+            y = y + 1;
+            visited(x + border/2 , y + border/2) = 1;
+            dir = 1;
+        elseif dir == 1
+            x = x + 1;
+            visited(x + border/2 , y + border/2) = 1;
+            dir = 2;
+        elseif dir == 2
+            y = y - 1;
+            visited(x + border/2 , y + border/2) = 1;
+            dir = 3;
+        elseif dir == 3
+            x = x - 1;
+            visited(x + border/2 , y + border/2) = 1;
+            dir = 0;
+        else
+            error('Direction Bug');
         end
-    end
-    
-    if dir == 0
-        x1 = x;
-        y1 = y + 1;
-    elseif dir == 1
-        x1 = x + 1;
-        y1 = y;
-    elseif dir == 2
-        x1 = x;
-        y1 = y - 1;
-    elseif dir == 3
-        x1 = x - 1;
-        y1 = y;
+
+        if x > 0 && xmax > x && y > 0 && ymax > y        
+            if img(y,x) == 0 && excl(x,y) == 0
+                k = 1;
+                break
+            end
+        end
+
+        if dir == 0
+            x1 = x;
+            y1 = y + 1;
+        elseif dir == 1
+            x1 = x + 1;
+            y1 = y;
+        elseif dir == 2
+            x1 = x;
+            y1 = y - 1;
+        elseif dir == 3
+            x1 = x - 1;
+            y1 = y;
+        else
+            error('Direction Bug');
+        end
+
+        if x1 + border/2 > 0 && x1 + border/2 <= xmax+border && y1 + border/2 > 0 && y1 + border/2 <= ymax+border
+            if visited(x1 + border/2 , y1 + border/2) == 1
+               if dir == 0
+                   dir = 3;
+               elseif dir == 1
+                   dir = 0;
+               elseif dir == 2
+                   dir = 1;
+               elseif dir == 3
+                   dir = 2;
+               end
+            end
+        else
+            x = nan;
+            y = nan;
+            k = 1;
+        end
     else
-        error('Direction Bug');
-    end
-    
-    if visited(x1 + border/2 , y1 + border/2) == 1
-       if dir == 0
-           dir = 3;
-       elseif dir == 1
-           dir = 0;
-       elseif dir == 2
-           dir = 1;
-       elseif dir == 3
-           dir = 2;
-       end
+        x = nan;
+        y = nan;
+        k = 1;
     end
 end
 
 if x == 0 && y == 0
-    out = null;
+    out = [nan nan];
 else
     out = [x y];
 end

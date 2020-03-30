@@ -21,8 +21,14 @@ classdef taxonData
             
             eName = [char(inName), '.tif'];
             ldmk = autoLdmk(eName,nLdmk);
-            [obj.harm,~,~,Pwr] = efa1(nLdmk,ldmk,40,10);
-            obj.pwr = Pwr./Pwr(39);
+            
+            if isempty(ldmk)
+                obj.harm = [];
+                obj.pwr = [];
+            else
+                [obj.harm,~,~,Pwr] = efa1(nLdmk,ldmk,40,10);
+                obj.pwr = Pwr./Pwr(39);
+            end
         end
         
         %% DATA
@@ -44,6 +50,15 @@ classdef taxonData
         % check if taxon is in a clade
         function inClade = checkClade(obj,clade)
             inClade = obj.clade == clade;
+        end
+        
+        %% PLOTS
+        
+        % draw taxon
+        function Draw(obj,col,resolution)
+            [x,y] = efaDraw(obj.harm,resolution);
+            fill(x,y,col);
+            axis equal
         end
     end
 end
