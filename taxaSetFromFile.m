@@ -35,12 +35,32 @@ Pwr = zeros(N,39);
 
 taxa = taxonData.empty(0,1);
 
+LoadBar(0,N);
+
 for i = 1:N
+    disp(names{i});
+    n = numel(names{i}) + 1;
     taxa(i) = taxonData(names(i),FAD(i),LAD(i),clade(i),nLdmk);
-    Pwr(i,:) = taxa(i).pwr;
-    S = [num2str(i*100/N),'%'];
-    disp(S);
+    if ~isempty(taxa(i).pwr)
+    	Pwr(i,:) = taxa(i).pwr;
+    end
+    LoadBar(i,N,n);
 end
+
+i = 1;
+while i <= length(taxa)
+    if isempty(taxa(i).harm)
+        S = strcat('WARNING: ',names{i},' could not be landmarked and was omitted. Please check image file.');
+        disp(S);
+        taxa(i) = [];
+        names(i) = [];
+        Pwr(i,:) = [];
+        i = i - 1;
+    end
+    i = i + 1;
+end
+    
+
 sPwr = prctile(Pwr,[5 95]);
 
 search = true;
@@ -54,7 +74,7 @@ end
 
 harm = zeros(N,4*nHarm - 3);
 
-for i = 1:N
+for i = 1:length(taxa)
     harm(i,:) = taxa(i).harmRow(nHarm);
 end
 

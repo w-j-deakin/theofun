@@ -85,6 +85,17 @@ classdef taxaSet
             end
         end
         
+        % test whether any taxa are ungrouped
+        function tf = UnGrouped(obj)
+            tf = false;
+            for i = 1:obj.num
+                if obj.taxa(i).clade == 0 || isnan(obj.taxa(i).clade) || isempty(obj.taxa(i).clade)
+                    tf = true;
+                    break;
+                end
+            end
+        end
+        
         % return taxaset in a clade
         function obj = cladeSplit(inObj,clade)
             
@@ -137,7 +148,7 @@ classdef taxaSet
             
             nCol = length(cmap);
             
-            rC = round(nCol/nC);
+            rC = nCol/nC;
             
             col = zeros(nC,3);
             
@@ -145,7 +156,7 @@ classdef taxaSet
             
             for i = 1:nC
                 objs(i) = inObj.cladeSplit(inObj.clades(i));
-                col(i,:) = cmap(1+(i-1)*rC,:);
+                col(i,:) = cmap(round(1+(i-1)*rC),:);
             end
         end
         
@@ -199,8 +210,8 @@ classdef taxaSet
                 isFilled = true;
             end
 
-            Sym = {'ko'; 'ks'; 'kd'; 'k^'; 'kv'; 'ko'; 'ks'; 'kd'; 'k^'; 'kv'; 'ko'; 'ks'; 'kd'; 'k^'; 'kv'; 'ko'; 'ks'; 'kd'; 'k^'; 'kv'};
-            Sz = [3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3];
+            Sym = {'ko'; 'ks'; 'kd'; 'k^'; 'kv'};
+            Sz = [5 6 6 5 5];
             [group, nC, col] = obj.totalCladeSplit;
             
             for i = 1:nC
@@ -217,17 +228,30 @@ classdef taxaSet
                     end
                 end
                 hold on
-                plot(x,y,Sym{i},'MarkerFaceColor',col(i,:),'MarkerSize',Sz(i));
+            end
+            
+            ungrouped = obj.UnGrouped();
+            
+            if ungrouped
+                pts(1) = plot(obj.scores(:,ax1PC),obj.scores(:,ax2PC),'ko','MarkerFaceColor','k','MarkerSize',3);
+                legendNames = [{'Ungrouped'};obj.cNames];
+            else
+                legendNames = obj.cNames;
             end
             
             for i = 1:nC
                 x = group(i).scores(:,ax1PC);
                 y = group(i).scores(:,ax2PC);
-                pts(i) = plot(x,y,Sym{i},'MarkerFaceColor',col(i,:),'MarkerEdgeColor',col(i,:)*0.8,'MarkerSize',Sz(i));
+                if ungrouped
+                    idx = i + 1;
+                else
+                    idx = i;
+                end
+                pts(idx) = plot(x,y,Sym{mod(i-1,5)+1},'MarkerFaceColor',col(i,:),'MarkerSize',Sz(mod(i-1,5)+1));
                 hold on
             end
             
-            lgd = legend(pts,obj.cNames);
+            lgd = legend(pts,legendNames);
             legend('boxoff');
             lgd.FontSize = 10;
             lgd.Location = 'eastoutside';
@@ -255,6 +279,20 @@ classdef taxaSet
                 yL = ['PC',num2str(pcy),' (',num2str(obj.explained(pcy)),'%)'];
                 xlabel(xL);
                 ylabel(yL);
+            end
+        end
+        
+        % plot names
+        function PlotNames(obj,pcx,pcy,size)
+            ax = gca;
+            rX = ax.XLim(2) - ax.XLim(1);
+            rY = ax.YLim(2) - ax.YLim(1);
+            xD = rX/obj.num;
+            yD = rY/obj.num;
+            
+            for i = 1:obj.num
+                hold on
+                text(obj.scores(i,pcx)+xD,obj.scores(i,pcy)+yD,obj.taxa(i).name,'FontSize',size);
             end
         end
         
@@ -312,10 +350,10 @@ classdef taxaSet
         end
         
         % generate and plot ShapeSpace
-        function ss = theoMorph(obj,ax1PC,ax2PC,n,margin,flip)
+        function ss = theoMorph(obj,ax1PC,ax2PC,n,margin,showNames)
             
             if nargin < 6
-                flip = false;
+                showNames = false;
             end
             
             x = obj.scores(:,ax1PC);
@@ -332,22 +370,13 @@ classdef taxaSet
             xR = [(minX - xtr) (maxX + xtr)];
             yR = [(minY - xtr) (maxY + xtr)];
             
-            if flip
-                ss = shapespace(obj,ax2PC,ax1PC,n,yR,xR);
-                xR = ss.yR;
-                yR = ss.xR;
-            
-                nx = ss.Ny;
-                ny = ss.Nx;
-            else
-                ss = shapespace(obj,ax1PC,ax2PC,n,xR,yR);
-            
-                xR = ss.xR;
-                yR = ss.yR;
-            
-                nx = ss.Nx;
-                ny = ss.Ny;
-            end
+            ss = shapespace(obj,ax1PC,ax2PC,n,xR,yR);
+
+            xR = ss.xR;
+            yR = ss.yR;
+
+            nx = ss.Nx;
+            ny = ss.Ny;
             
             bX = (xR(2) - xR(1)) / (nx);
             bY = (yR(2) - yR(1)) / (ny);
@@ -360,10 +389,13 @@ classdef taxaSet
             set(gcf,'defaultAxesDataAspectRatioMode','manual');
             set(gcf,'defaultAxesDataAspectRatio',[1 1 1]);
             
-            ss.plotGrid(flip);
+            ss.plotGrid();
             axis equal
             hold on
             obj.Cmorph(ax1PC,ax2PC,true);
+            if showNames
+                obj.PlotNames(ax1PC,ax2PC,7);
+            end
             xlim(xL);
             ylim(yL);
             
@@ -498,8 +530,6 @@ classdef taxaSet
             x = obj.scores(:,pcx);
             y = obj.scores(:,pcy);
             
-%             plot(x,y,'ko','MarkerFaceColor','w','MarkerEdgeColor',[0.25 0.25 0.25],'MarkerSize',3);
-%             hold on
             
             for i = 1:length(phylogeny.taxa)
                 for j = 1:length(obj.taxa)
@@ -523,13 +553,6 @@ classdef taxaSet
                 plot([X(i) X(phylogeny.nodes(i).parent)], [Y(i) Y(phylogeny.nodes(i).parent)],'k-','Color',[0.25 0.25 0.25]);
                 hold on
             end
-%             for i = 1:length(phylogeny.taxa)
-%                 C = phylogeny.NodeColor(i);
-%                 plot(X(i),Y(i),'ko','MarkerFaceColor',C,'MarkerEdgeColor',[0.25 0.25 0.25],'MarkerSize',3);
-%                 hold on
-% %                text(X(i)+0.002,Y(i)+0.002,phylogeny.taxa(i).name,'FontSize',8);
-%             end
-%             obj.PlotClade(pcx,pcy);
             obj.Cmorph(pcx,pcy);
         end
         
