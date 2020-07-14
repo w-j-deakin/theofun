@@ -285,9 +285,12 @@ classdef meshSpace
         
         % Pareto optimal landscape
         
-        function LS = morphPF(obj,LS1,LS2,opt1,opt2,hue,showTaxa)
+        function LS = morphPF(obj,LS1,LS2,opt1,opt2,hue,nCont,showTaxa)
             
             if nargin < 7
+                nCont = 10;
+            end
+            if nargin < 8
                 showTaxa = true;
             end
             
@@ -296,7 +299,7 @@ classdef meshSpace
             R = p.RankRatio;
             
             LS = landscape(LS1.xgrid,LS1.ygrid,LS1.grid(R));
-            LS.heatMap(hue);
+            LS.heatMap(hue,nCont);
             axis equal
             
             if showTaxa
