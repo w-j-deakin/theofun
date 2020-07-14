@@ -186,6 +186,66 @@ classdef taxaSet
         
         %% PLOTS
         
+        % test and plot morphosapces robustness to sample size
+        function Robustness(obj,nSamp,nC)
+            r = obj.num/20;
+            line = zeros(20,nC);
+            lim = zeros(20,nC);
+            
+            C = obj.coeff;
+            
+            for i = 1:nC
+                C(:,i) = C(:,i)/norm(C(:,i));
+            end
+            
+            for i = 1:20
+                N(i) = round(r*i);
+                diff = zeros(nSamp,nC);
+                for j = 1:nSamp
+                    p = randi(obj.num,N(i),1);
+                    T = obj.taxa(p);
+                    X = T(1).harmRow(obj.nHarm);
+                    for k = 2:N(i)
+                        X = vertcat(X,T(k).harmRow(obj.nHarm));
+                    end
+                    [c,~,~,~,~,m] = pca(X);
+                    
+                    [~,nc] = size(c);
+                    for k = 1:nC
+                        if k <= nc
+                            c(:,k) = c(:,k)/norm(C(:,k));
+                            diff(j,k) = AngleND(C(:,k),c(:,k));
+                            if diff(j,k) > pi/2
+                                diff(j,k) = pi - diff(j,k);
+                            end
+                        else
+                            diff(j,k) = nan;
+                        end
+                    end
+                    diffm(j) = norm(obj.mu - m);
+                end
+                line(i,:) = mean(diff);
+                lim(i,:) = 2.576 * std(diff) / (sqrt(nSamp));
+                linem(i) = mean(diffm);
+                limm(i) = 2.576 * std(diffm) / (sqrt(nSamp));
+            end
+            figure
+            errorbar(N,linem,limm);
+            xlabel('Subsample Size');
+            ylabel('Error in Mean');
+            
+            figure
+            for i = 1:nC
+                S = ['PC', num2str(i)];
+                errorbar(N,line(:,i),lim(:,i),'DisplayName', S);
+                hold on
+            end
+            ylim([0 pi/2]);
+            legend
+            xlabel('Subsample Size');
+            ylabel('PC Orientation Difference (Radians)');
+        end
+        
         % scree plot of explained PCA variance
         function pcaScree(obj)
 
