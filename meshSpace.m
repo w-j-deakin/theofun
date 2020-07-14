@@ -201,6 +201,26 @@ classdef meshSpace
             toc
         end
         
+        % Use the template to create your own functional calculation
+        
+        function output = customFunction(obj,func,var)
+            nM = obj.SS.Nx*obj.SS.Ny;
+            
+            output = cell(nM,1);
+            
+            idx = 1;
+            
+            for i = 1:nM
+                [I,J] = obj.vec2grid(i);
+                if obj.isMeshed(I,J)
+                    output{i} = func(obj.mesh.mesh(idx),var);
+                    idx = idx + 1;
+                else
+                    output{i} = nan;
+                end
+            end
+        end
+        
         %% PLOTS
         
         % generate landscape
