@@ -583,39 +583,6 @@ classdef taxaSet
             csvwrite(filename,A);
         end
         
-        
-        % PhyloMorphospace
-        
-        function PhyloMorph(obj,pcx,pcy,phylogeny,ancestors)
-            x = obj.scores(:,pcx);
-            y = obj.scores(:,pcy);
-            
-            
-            for i = 1:length(phylogeny.taxa)
-                for j = 1:length(obj.taxa)
-                    if strcmp(phylogeny.taxa(i).name,obj.taxa(j).name)
-                        X(i) = x(j);
-                        Y(i) = y(j);
-                        break;
-                    end
-                end
-            end
-            
-            
-            for i = length(phylogeny.taxa)+1:length(phylogeny.nodes)
-                Anc = ancestors(i-length(phylogeny.taxa),4:end);
-                v = (Anc - obj.mu) * obj.coeff;
-                X(i) = v(pcx);
-                Y(i) = v(pcy);
-            end
-            
-            for i = 1:length(phylogeny.nodes)-1
-                plot([X(i) X(phylogeny.nodes(i).parent)], [Y(i) Y(phylogeny.nodes(i).parent)],'k-','Color',[0.25 0.25 0.25]);
-                hold on
-            end
-            obj.Cmorph(pcx,pcy);
-        end
-        
     end
 end
 
