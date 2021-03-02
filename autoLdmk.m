@@ -6,6 +6,13 @@ img = imread(image);
 
 [imgH,imgW] = size(img);
 
+% check that image is mainly white pixels
+minWhite = imgH * imgW * 255 / 2;
+sumWhite = sum(sum(img));
+if sumWhite < minWhite
+    img = imcomplement(img);
+end
+
 % Starting from the top left corner, move diagonally until a pixel is found
 xS = 2;
 yS = 2;
