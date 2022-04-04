@@ -278,7 +278,7 @@ classdef taxaSet
                 x = group(i).scores(:,ax1PC);
                 y = group(i).scores(:,ax2PC);
                 
-                if length(x) > 3
+                if length(x) > 2
                     ch = convhull(x,y);
                 
                     if isFilled
