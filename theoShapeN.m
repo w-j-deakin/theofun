@@ -63,8 +63,8 @@ classdef theoShapeN
             X = zeros(n,nHarm);
             Y = zeros(n,nHarm);
             
-            x = zeros(n);
-            y = zeros(n);
+            x = zeros(n,1);
+            y = zeros(n,1);
             
             for i = 1:n
                 for j = 1:nHarm
@@ -80,6 +80,49 @@ classdef theoShapeN
                 y = (y*s) + inY;
             end
             
+        end
+
+        %% functional calculations
+
+        % wing aspect ratio
+        function AR = AspectRatio(obj,n)
+            if (obj.isIntersect)
+                AR = nan;
+            else
+                [x,y] = obj.draw(n,0,0,1);
+                L = max(x) - min(x);
+                disp(L);
+                A = polyarea(x,y);
+                disp(A);
+                AR = L*L/A;
+            end
+        end
+
+        % second moment of area
+        function [ix, iy] = SMOA(obj, n)
+            if (obj.isIntersect)
+                iy = nan;
+                ix = nan;
+            else
+                [x,y] = obj.draw(n,0,0,1);
+                A = polyarea(x,y);
+                x = x / sqrt(A);
+                y = y / sqrt(A);
+                preI = n;
+                iy = 0;
+                ix = 0;
+                for i = 1:n
+                    x0 = x(preI);
+                    x1 = x(i);
+                    y0 = y(preI);
+                    y1 = y(i);
+                    ix = ix + (((x0*y1)-(x1*y0))*((y0*y0)+(y0*y1)+(y1*y1)));
+                    iy = iy + (((x0*y1)-(x1*y0))*((x0*x0)+(x0*x1)+(x1*x1)));
+                    preI = i;
+                end
+            end
+            iy = iy / 12;
+            ix = ix / 12;
         end
         
     end

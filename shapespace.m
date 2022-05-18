@@ -177,8 +177,37 @@ classdef shapespace
             fill(ox,oy,col,'LineStyle','none');
         end
         
+        %% functional landscapes
+
+        % wing aspect ratio landscape
+        function ls = AspectRatioLandscape(obj,n)
+            z = zeros(obj.Nx, obj.Ny);
+            for i = 1:obj.Nx
+                for j = 1:obj.Ny
+                    I = (i-1)*obj.Ny + j;
+                    z(i,j) = obj.shapes(I).AspectRatio(n);
+                end
+            end
+
+            [xgrid,ygrid] = meshgrid(obj.X, obj.Y);
+            ls = landscape(xgrid', ygrid', z);
+        end
         
-        
+        % smoa landscape
+        function [ixLS, iyLS] = SMOALandscape(obj,n)
+            ix = zeros(obj.Nx, obj.Ny);
+            iy = zeros(obj.Nx, obj.Ny);
+            for i = 1:obj.Nx
+                for j = 1:obj.Ny
+                    I = (i-1)*obj.Ny + j;
+                    [ix(i,j), iy(i,j)] = obj.shapes(I).SMOA(n);
+                end
+            end
+
+            [xgrid,ygrid] = meshgrid(obj.X, obj.Y);
+            ixLS = landscape(xgrid', ygrid', ix);
+            iyLS = landscape(xgrid', ygrid', iy);
+        end
     end
 end
 
