@@ -90,39 +90,62 @@ classdef theoShapeN
                 AR = nan;
             else
                 [x,y] = obj.draw(n,0,0,1);
-                L = max(x) - min(x);
-                disp(L);
+                [~,baseID] = min(x);
+                [~,tipID] = max(x);
+
+                L = norm([(x(tipID) - x(baseID)) (y(tipID) - y(baseID))]);
+
                 A = polyarea(x,y);
-                disp(A);
                 AR = L*L/A;
             end
         end
 
-        % second moment of area
-        function [ix, iy] = SMOA(obj, n)
+        % moment of area
+
+        function [i1x, i1y, i2x, i2y, i2z] = MoA(obj, n)
             if (obj.isIntersect)
-                iy = nan;
-                ix = nan;
+                i1x = nan;
+                i1y = nan;
+                i2x = nan;
+                i2y = nan;
+                i2z = nan;
             else
                 [x,y] = obj.draw(n,0,0,1);
-                A = polyarea(x,y);
-                x = x / sqrt(A);
-                y = y / sqrt(A);
+                [~,baseID] = min(x);
+                [~,tipID] = max(x);
+                A = findAngle2D([1 0], [(x(tipID) - x(baseID)) (y(tipID) - y(baseID))]);
+                x = x - x(baseID);
+                y = y - y(baseID);
+
+                points = Rotate([x y], A);
+
+                A = polyarea(points(:,1),points(:,2));
+                points = points / sqrt(A);
+
                 preI = n;
-                iy = 0;
-                ix = 0;
+                i1x = 0;
+                i1y = 0;
+                i2x = 0;
+                i2y = 0;
                 for i = 1:n
-                    x0 = x(preI);
-                    x1 = x(i);
-                    y0 = y(preI);
-                    y1 = y(i);
-                    ix = ix + (((x0*y1)-(x1*y0))*((y0*y0)+(y0*y1)+(y1*y1)));
-                    iy = iy + (((x0*y1)-(x1*y0))*((x0*x0)+(x0*x1)+(x1*x1)));
+                    x0 = points(preI,1);
+                    x1 = points(i,1);
+                    y0 = points(preI,2);
+                    y1 = points(i,2);
+                    A = x0*y1 - x1*y0;
+                    i1x = i1x + A * (y0 + y1);
+                    i1y = i1y + A * (x0 + x1);
+                    i2x = i2x + A * (y0*y0 + y0*y1 + y1*y1);
+                    i2y = i2y + A * (x0*x0 + x0*x1 + x1*x1);
                     preI = i;
                 end
+                
+                i1x = abs(i1x / 6);
+                i1y = abs(i1y / 6);
+                i2x = abs(i2x / 12);
+                i2y = abs(i2y / 12);
+                i2z = i2x + i2y;
             end
-            iy = iy / 12;
-            ix = ix / 12;
         end
         
     end

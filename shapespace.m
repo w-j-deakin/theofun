@@ -193,20 +193,27 @@ classdef shapespace
             ls = landscape(xgrid', ygrid', z);
         end
         
-        % smoa landscape
-        function [ixLS, iyLS] = SMOALandscape(obj,n)
-            ix = zeros(obj.Nx, obj.Ny);
-            iy = zeros(obj.Nx, obj.Ny);
+        % moa landscapes
+        function [i1xLS, i1yLS, i2xLS, i2yLS, i2zLS] = MoALandscape(obj,n)
+            i1x = zeros(obj.Nx, obj.Ny);
+            i1y = zeros(obj.Nx, obj.Ny);
+            i2x = zeros(obj.Nx, obj.Ny);
+            i2y = zeros(obj.Nx, obj.Ny);
+            i2z = zeros(obj.Nx, obj.Ny);
+
             for i = 1:obj.Nx
                 for j = 1:obj.Ny
                     I = (i-1)*obj.Ny + j;
-                    [ix(i,j), iy(i,j)] = obj.shapes(I).SMOA(n);
+                    [i1x(i,j), i1y(i,j), i2x(i,j), i2y(i,j), i2z(i,j)] = obj.shapes(I).MoA(n);
                 end
             end
 
             [xgrid,ygrid] = meshgrid(obj.X, obj.Y);
-            ixLS = landscape(xgrid', ygrid', ix);
-            iyLS = landscape(xgrid', ygrid', iy);
+            i1xLS = landscape(xgrid', ygrid', i1x);
+            i1yLS = landscape(xgrid', ygrid', i1y);
+            i2xLS = landscape(xgrid', ygrid', i2x);
+            i2yLS = landscape(xgrid', ygrid', i2y);
+            i2zLS = landscape(xgrid', ygrid', i2z);
         end
     end
 end
