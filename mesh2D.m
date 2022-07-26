@@ -643,7 +643,13 @@ classdef mesh2D
         function vms = feaK(obj,F,C,dK,D,B,shft)
             nN = length(obj.x);
             nE = obj.nEle;
-            nK = 2*(nN-2);
+            nC = 0;
+            for i = 1:nN
+                if C(i) == 1
+                    nC = nC + 1;
+                end
+            end
+            nK = 2*(nN-nC);
 
             % FORCES
 
