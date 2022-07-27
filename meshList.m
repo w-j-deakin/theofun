@@ -27,11 +27,7 @@ classdef meshList
                         obj.mesh(k) = M;
                     end
                 end
-                p(i) = i*100/N;
-                if (p(i) >= 25 && p(i-1) < 25) || (p(i) >= 50 && p(i-1) < 50) || (p(i) >= 75 && p(i-1) < 75)
-                    S = [num2str(p(i)),'%'];
-                    disp(S);
-                end
+                LoadBar(i,N,0);
             end
             
             obj.n = k;
