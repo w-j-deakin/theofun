@@ -71,6 +71,11 @@ classdef ParetoND
                     [nT,~] = size(obj.var);
 
                     inR = zeros(nT,1);
+                    for j = 1:nT
+                        if any(isnan(obj.var(j,:)))
+                            inR(j) = nan;
+                        end
+                    end
                     i = 1;
                 end
                 inR(obj.D) = i;
@@ -93,7 +98,9 @@ classdef ParetoND
             R = zeros(length(RO),1);
             
             for i = 1:length(RO)
-                if RO(i) == 1
+                if isnan(RO(i))
+                    R(i) = nan;
+                elseif RO(i) == 1
                     R(i) = 1;
                 else
                     R(i) = (RS(i) - 1) / (RO(i) + RS(i) - 2);
