@@ -379,7 +379,7 @@ classdef taxaSet
             [objs,nC,col] = obj.totalCladeSplit;
             Sym = {'ko'; 'ks'; 'kd'; 'k^'; 'kv'};
             for i = 1:nC
-                objs(i).Plot(pcx,pcy,Sym{i},col(i,:),false);
+                objs(i).Plot(pcx,pcy,Sym{mod(i,5)+1},col(i,:),false);
                 hold on
             end
         end
