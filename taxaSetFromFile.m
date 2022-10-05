@@ -48,7 +48,7 @@ for i = 1:N
 end
 
 i = 1;
-while i <= length(taxa)
+while i <= N
     if isempty(taxa(i).harm)
         S = strcat('WARNING: ',names{i},' could not be landmarked and was omitted. Please check image file.');
         disp(S);
