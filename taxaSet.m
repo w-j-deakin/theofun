@@ -184,6 +184,17 @@ classdef taxaSet
             end
         end
         
+        % change number of harmonics
+        
+        function obj = HarmonicNumber(obj,N)
+            obj.nHarm = N;
+            V = zeros(obj.num,4*N - 3);
+            for i = 1:obj.num
+               V(i,:) = obj.taxa(i).harmRow(N); 
+            end
+            [obj.coeff, obj.scores, ~, ~, obj.explained, obj.mu] = pca(V);
+        end
+        
         %% PLOTS
         
         % test and plot morphosapces robustness to sample size
