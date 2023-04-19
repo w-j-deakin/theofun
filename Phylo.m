@@ -9,7 +9,7 @@ classdef Phylo
     methods
         function obj = Phylo(taxaSet,edgeFile,labelFile)
             obj.edges = importdata(edgeFile);
-            obj.edges = obj.edges.data;
+            
             tips = importdata(labelFile);
             obj.taxa = taxonData.empty(0,1);
             
@@ -38,7 +38,7 @@ classdef Phylo
             
         end
         
-        function Plot(obj,minLength)
+        function nodes = CalculateNodes(obj)
             nodes = PhyloNode.empty(0,1);
             
             [nR, ~] = size(obj.edges);
@@ -58,6 +58,10 @@ classdef Phylo
             for i = 1:nR+1
                 nodes(i).y = nodes(i).CalculateY(nodes);
             end
+        end
+        
+        function Plot(obj,minLength)
+            nodes = obj.CalculateNodes();
             
             for i = 1:nR+1
                 nodes(i).Plot(nodes,minLength);
@@ -77,22 +81,10 @@ classdef Phylo
         end
         
         function Phylomorphospace(obj,TDS,ancestorFile,pcx,pcy)
-            nodes = PhyloNode.empty(0,1);
-            
-            [nR, ~] = size(obj.edges);
-            
-            for i = 1:nR+1
-                nodes(i) = PhyloNode(i);
-            end
-            
-            for i = 1:nR
-                nodes(obj.edges(i,1)) = nodes(obj.edges(i,1)).AddChild(obj.edges(i,2));
-                nodes(obj.edges(i,2)).parent = obj.edges(i,1);
-            end
+            nodes = obj.CalculateNodes();
             
             anc = importdata(ancestorFile);
             anc = anc.data(1:end, 4:end);
-            disp(anc);
             
             [nr,nc] = size(anc);
             
@@ -118,6 +110,50 @@ classdef Phylo
             end
             
             TDS.PlotClade(1,2);
+            
+        end
+        
+        function AncestorPhylo(obj,ancestorFile,minL,s)
+            nodes = obj.CalculateNodes();
+            
+            anc = importdata(ancestorFile);
+            anc = anc(1:end, 4:end);
+            
+            [nr,~] = size(anc);
+            
+            for i = 1:nr
+                ancShapes(i,1) = theoShapeN(1,anc(i,:));
+            end
+            
+            for i = 1:length(obj.taxa)
+                taxaShapes(i,1) = theoShapeN(1,obj.taxa(i).harm);
+            end
+            
+            shapes = vertcat(taxaShapes,ancShapes);
+            
+            
+            
+            figure
+            
+            for i = 1:length(nodes)
+                nodes(i).Plot(nodes,minL);
+                hold on
+                x = nodes(i).GetMaxBranchLength(nodes) * minL * -1;
+                [x,y] = shapes(i).draw(100,x,nodes(i).y,minL*s);
+                fill(x,y,[0.75 0.75 0.75]);
+            end
+            
+            for i = 1:length(obj.taxa)
+                text(minL * -0.5,i,obj.taxa(i).name, 'FontSize', 7);
+            end
+            
+            ax = gca;
+            xL = ax.XLim;
+            xL(2) = minL * 3;
+            ax.XLim = xL;
+            
+            axis equal
+            axis off
             
         end
         
