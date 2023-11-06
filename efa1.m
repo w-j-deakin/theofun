@@ -119,13 +119,10 @@ while(run)
     
     if max(y) > max(x)
         theta = theta - pi/2;
+    elseif mat(1,1,1) < 0
+        theta = theta + pi;
     else
         run = false;
-    end
-    
-    if mat(1,1,1) < 0
-        theta = theta + pi;
-        run = true;
     end
     
 end
