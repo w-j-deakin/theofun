@@ -147,6 +147,61 @@ classdef theoShapeN
                 i2z = i2x + i2y;
             end
         end
+
+        % Muscle attachment
+        function A = MuscleAttachmentArea(obj,L,alpha)
+            % Cut the shape in half with a line that has an angle alpha
+            % from the vertical, and intersects the top surface of the
+            % outline a distance L away from the minimum x point.
+
+            if obj.isIntersect
+                A = nan;
+                return
+            end
+
+            [x,y] = obj.draw(500,0,0,1);
+            shp = polyshape(x,y);
+            totA = area(shp);
+
+            x = x ./ sqrt(totA);
+            y = y ./ sqrt(totA);
+            
+            minx = min(x);
+            maxx = max(x);
+            r = maxx - minx;
+            L = r * L;
+            xP = minx + L;
+            points = [0 0];
+
+            for i = 1:499
+                if (x(i) >= xP && x(i+1) < xP) || (x(i) < xP && x(i+1) >= xP)
+                    p = [x(i+1)-x(i) y(i+1)-y(i)];
+                    p = p / (x(i+1) - x(i));
+                    p = p * (xP-x(i));
+                    p = [x(i) y(i)] + p;
+                    points = vertcat(points,p);
+                end
+            end
+            points(1,:) = [];
+            if isempty(points)
+                A = 1;
+            else
+                [~,id] = max(points(:,2));
+                P = points(id,:);
+                x = x - P(1);
+                y = y - P(2);
+                ps = Rotate([x y],alpha*-1);
+                ps1 = ps;
+                for i = 500:-1:1
+                    if ps1(i,1) > 0
+                        ps1(i,:) = [];
+                    end
+                end
+                shp1 = polyshape(ps1(:,1),ps1(:,2));
+                A = area(shp1);
+           
+            end
+        end
         
     end
 end
