@@ -215,6 +215,50 @@ classdef shapespace
             i2yLS = landscape(xgrid', ygrid', i2y);
             i2zLS = landscape(xgrid', ygrid', i2z);
         end
+
+        % muscle attachment landscape
+        function [maMLS, ma5LS, ma95LS] = MALandscape(obj,L,alpha,nSamp,LRange,alphaRange)
+            xgrid = zeros(obj.Nx, obj.Ny);
+            ygrid = zeros(obj.Nx, obj.Ny);
+            zgrid = zeros(obj.Nx, obj.Ny);
+
+            for i = 1:obj.Nx
+                for j = 1:obj.Ny
+                    xgrid(i,j) = obj.X(i);
+                    ygrid(i,j) = obj.Y(j);
+                end
+            end
+
+            if nargin < 4
+                for i = 1:obj.Nx
+                    for j = 1:obj.Ny
+                        I = (i-1)*obj.Ny + j;
+                        zgrid(i,j) = obj.shapes(I).MuscleAttachmentArea(L,alpha);
+                    end
+                end
+                maMLS = landscape(xgrid,ygrid,zgrid);
+            else
+                zgrid5 = zeros(obj.Nx, obj.Ny);
+                zgrid95 = zeros(obj.Nx, obj.Ny);
+                a = zeros(nSamp,1);
+                for i = 1:obj.Nx
+                    for j = 1:obj.Ny
+                        I = (i-1)*obj.Ny + j;
+                        for k = 1:nSamp
+                            alp = alpha + (rand-0.5) * alphaRange;
+                            len = L + (rand-0.5) * LRange;
+                            a(k) = obj.shapes(I).MuscleAttachmentArea(len,alp);
+                        end
+                        zgrid(i,j) = nanmean(a);
+                        zgrid5(i,j) = prctile(a,5);
+                        zgrid95(i,j) = prctile(a,95);
+                    end
+                end
+                maMLS = landscape(xgrid,ygrid,zgrid);
+                ma5LS = landscape(xgrid,ygrid,zgrid5);
+                ma95LS = landscape(xgrid,ygrid,zgrid95);
+            end
+
     end
 end
 
