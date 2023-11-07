@@ -258,6 +258,7 @@ classdef shapespace
                 ma5LS = landscape(xgrid,ygrid,zgrid5);
                 ma95LS = landscape(xgrid,ygrid,zgrid95);
             end
+        end
 
     end
 end
