@@ -113,11 +113,15 @@ classdef theoShapeN
                 [x,y] = obj.draw(n,0,0,1);
                 [~,baseID] = min(x);
                 [~,tipID] = max(x);
-                A = findAngle2D([1 0], [(x(tipID) - x(baseID)) (y(tipID) - y(baseID))]);
+                [~,a] = findAngle2D([1 0], [(x(tipID) - x(baseID)) (y(tipID) - y(baseID))]);
+
+                if y(tipID)-y(baseID) > 0
+                    a = -a;
+                end
                 x = x - x(baseID);
                 y = y - y(baseID);
 
-                points = Rotate([x y], A);
+                points = Rotate([x y], a);
 
                 A = polyarea(points(:,1),points(:,2));
                 points = points / sqrt(A);
@@ -203,6 +207,96 @@ classdef theoShapeN
             end
         end
         
+        % Wing Agility
+        function dq = WingAgility(obj,res)
+            if obj.isIntersect
+                dq = nan;
+                return;
+            end
+            % draw outline
+            [x,y] = obj.draw(res,0,0,1);
+
+            % find minimum x point, set to [0 0].
+            [~,baseID] = min(x);
+            [~,tipID] = max(x);
+            [~,a] = findAngle2D([1 0], [(x(tipID) - x(baseID)) (y(tipID) - y(baseID))]);
+
+            if y(tipID)-y(baseID) > 0
+                a = -a;
+            end
+
+            x = x - x(baseID);
+            y = y - y(baseID);
+
+            points = Rotate([x y], a);
+
+            A = polyarea(points(:,1),points(:,2));
+            points = points / sqrt(A);
+
+            x = points(:,1);
+            y = points(:,2);
+
+            % evenly space sample points along wing length
+            X = linspace(0,max(x),res+2);
+            dx = X(2)-X(1);
+            X(1) = [];
+            X(end) = [];
+            Y = [0 0];
+
+            c = zeros(res,1);
+
+            nomYC4 = 0;
+            denomYC4 = 0;
+
+            % for each sample point
+            for i = 1:res
+                % for each outline segment
+                ylist = 0;
+                for j = 1:res
+                    % find end point of segment
+                    next = mod(j,res) + 1;
+
+                    % if the current sample point lies between the x values
+                    % of the segment
+                    if (x(j) >= X(i) && x(next) <= X(i)) || (x(j) <= X(i) && x(next) >= X(i))
+                        L = [x(j) y(j)] - [x(next) y(next)];
+                        d = X(i) - x(next);
+                        r = d/L(1);
+                        L = L * r;
+                        L = L + [x(next) y(next)];
+                        ylist = vertcat(ylist,L(2));
+                    end
+                end
+                ylist(1) = [];
+                Y(1) = min(ylist);
+                Y(2) = max(ylist);
+
+
+
+                c(i) = Y(2) - Y(1);
+                yc4 = Y(2) - (c(i)/4);
+
+                yc4 = abs(yc4);
+                
+                nomYC4 = nomYC4 + c(i) * yc4 * dx;
+                denomYC4 = denomYC4 + c(i) * dx;
+            end
+
+            yc4 = nomYC4 / denomYC4;
+            crmax = max(c);
+
+            shape = polyshape(x,y);
+            [~,CGy] = centroid(shape);
+
+            CGy = abs(CGy);
+
+            [~,~,I2x] = MoA(obj,res);
+
+
+
+            % formula (Harvey et al., 2022)
+            dq = ((((yc4/crmax)^0.8)*crmax)-CGy) / I2x;
+        end
     end
 end
 
