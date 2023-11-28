@@ -260,6 +260,21 @@ classdef shapespace
             end
         end
 
+        % wing agility landscape (Harvey et al 2022)
+        function dqLS = AgilityLandscape(obj,n)
+            dq = zeros(obj.Nx,obj.Ny);
+
+            for i = 1:obj.Nx
+                for j = 1:obj.Ny
+                    I = (i-1)*obj.Ny + j;
+                    dq(i,j) = obj.shapes(I).WingAgility(n);
+                end
+            end
+
+            [xgrid,ygrid] = meshgrid(obj.X, obj.Y);
+            dqLS = landscape(xgrid', ygrid', dq);
+            
+        end
     end
 end
 
