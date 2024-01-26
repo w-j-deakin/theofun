@@ -56,6 +56,7 @@ while i <= N
         names(i) = [];
         Pwr(i,:) = [];
         i = i - 1;
+        N = N - 1;
     end
     i = i + 1;
 end
