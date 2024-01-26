@@ -20,7 +20,12 @@ classdef taxonData
             obj.clade = inClade;
             
             eName = [char(inName), '.tif'];
-            ldmk = autoLdmk(eName,nLdmk);
+            
+            if isfile(eName)
+                ldmk = autoLdmk(eName,nLdmk);
+            else
+                ldmk = [];
+            end
             
             if isempty(ldmk)
                 obj.harm = [];
