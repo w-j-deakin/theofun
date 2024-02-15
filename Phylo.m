@@ -379,34 +379,43 @@ classdef Phylo
                     if legacy
                         for m = 1:id1
                             for n = 1:id2
-                                d = norm(M(L{i}(m),:) - M(L{j}(n),:));
-                                if d > Dmax
-                                    Dmax = d;
+                                if m ~= 1 && n ~= 1
+                                    d = norm(M(L{i}(m),:) - M(L{j}(n),:));
+                                    if d > Dmax
+                                        Dmax = d;
+                                    end
                                 end
                             end
                         end
                     else
-                        M1 = obj.InterpolateShapes(i,T{j},M,EL);
-                        M2 = obj.InterpolateShapes(j,T{i},M,EL);
-                        for m = 1:id1
+                        T1 = T{i}(id1) - (T{j}(id2) - T{j}(1:id2));
+                        T2 = T{j}(id2) - (T{i}(id1) - T{i}(1:id1));
+                        M1 = obj.InterpolateShapes(i,T1,M,EL);
+                        M2 = obj.InterpolateShapes(j,T2,M,EL);
+
+                        for m = 2:id1
                             d = norm(M(L{i}(m),:) - M2(m,:));
-                            if d > Dmax
+                            if T2(m) >= 0 && d > Dmax
                                 Dmax = d;
                             end
                         end
-                        for n = 1:id2
+                        for n = 2:id2
                             d = norm(M(L{j}(n),:) - M1(n,:));
-                            if d > Dmax
+                            if T1(n) >= 0 && d > Dmax
                                 Dmax = d;
                             end
                         end
                     end
 
                     id = id+1;
-                    C(id,1) = 1 - (Dtip/Dmax);
-                    C(id,2) = Dmax - Dtip;
-                    C(id,3) = C(id,2) / D3(mrca);
-                    C(id,4) = C(id,2) / D4(mrca);
+                    if Dmax ==  0
+                        C(id,:)  = [nan nan nan nan];
+                    else
+                        C(id,1) = 1 - (Dtip/Dmax);
+                        C(id,2) = Dmax - Dtip;
+                        C(id,3) = C(id,2) / D3(mrca);
+                        C(id,4) = C(id,2) / D4(mrca);
+                    end
                 end
             end
         end
