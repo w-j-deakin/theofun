@@ -177,7 +177,75 @@ classdef shapespace
             fill(ox,oy,col,'LineStyle','none');
         end
         
+         %% density landscape
+
+        function ls = DensityLandscape(obj,allAxes)
+            
+            data = obj.taxa.scores;
+            % bandwidth using silverman's rule of thumb
+            if nargin < 2
+                allAxes = true;
+            end
+
+            if allAxes
+                [nT,nV] = size(data);
+                pcX = obj.pcx;
+                pcY = obj.pcy;
+            else
+                data = horzcat(data(:,obj.pcx),data(:,obj.pcy));
+                pcX = 1;
+                pcY = 2;
+                nV = 2;
+            end
+
+            bw = zeros(nV,1);
+            for i = 1:nV
+                sig = std(data(:,i));
+                bw(i) = sig * ( 4 / ((nV + 2) * nT) ) ^ ( 1 / (nV + 4) );
+            end
+
+            nS = length(obj.shapes);
+            P = zeros(nS,nV);
+            for i = 1:length(obj.shapes)
+                P(i,pcX) = obj.shapes(i).v(1);
+                P(i,pcY) = obj.shapes(i).v(2);
+            end
+            d = mvksdensity(data,P,'Bandwidth',bw);
+            D = zeros(obj.Nx,obj.Ny);
+            for i = 1:obj.Nx
+                for j = 1:obj.Ny
+                    I = (i-1)*obj.Ny + j;
+                    if obj.shapes(I).isIntersect
+                        D(i,j) = nan;
+                    else
+                        D(i,j) = d(I);
+                    end
+                end
+            end
+
+            [xgrid,ygrid] = meshgrid(obj.X, obj.Y);
+            ls = landscape(xgrid', ygrid', D);
+        end
+        
         %% functional landscapes
+
+        % area landscape
+        function ls = AreaLandscape(obj,n)
+            if nargin < 2
+                n = 500;
+            end
+            z = zeros(obj.Nx, obj.Ny);
+            for i = 1:obj.Nx
+                for j = 1:obj.Ny
+                    I = (i-1)*obj.Ny + j;
+                    [x,y] = obj.shapes(I).Draw(n,0,0,1);
+                    z(i,j) = polyarea(x,y);
+                end
+            end
+            
+            [xgrid,ygrid] = meshgrid(obj.X, obj.Y);
+            ls = landscape(xgrid', ygrid', z);
+        end
 
         % wing aspect ratio landscape
         function ls = AspectRatioLandscape(obj,n)
