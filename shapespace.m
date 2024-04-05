@@ -188,15 +188,15 @@ classdef shapespace
             end
 
             if allAxes
-                [nT,nV] = size(data);
                 pcX = obj.pcx;
                 pcY = obj.pcy;
             else
                 data = horzcat(data(:,obj.pcx),data(:,obj.pcy));
                 pcX = 1;
                 pcY = 2;
-                nV = 2;
             end
+
+            [nT,nV] = size(data);
 
             bw = zeros(nV,1);
             for i = 1:nV
