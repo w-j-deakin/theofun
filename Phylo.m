@@ -468,7 +468,7 @@ classdef Phylo
             
             scr = vertcat(taxScr,ancScr);
             
-            for i = 1:nR+1
+            for i = 1:length(obj.nodes)
                 if ~isempty(obj.nodes(i).parent)
                     plot([scr(i,pcx) scr(obj.nodes(i).parent,pcx)], [scr(i,pcy) scr(obj.nodes(i).parent,pcy)], 'k-');
                     hold on
