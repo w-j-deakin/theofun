@@ -262,17 +262,18 @@ classdef shapespace
         end
         
         % moa landscapes
-        function [i1xLS, i1yLS, i2xLS, i2yLS, i2zLS] = MoALandscape(obj,n)
+        function [i1xLS, i1yLS, i2xLS, i2yLS, i2zLS, i3yLS] = MoALandscape(obj,n)
             i1x = zeros(obj.Nx, obj.Ny);
             i1y = zeros(obj.Nx, obj.Ny);
             i2x = zeros(obj.Nx, obj.Ny);
             i2y = zeros(obj.Nx, obj.Ny);
             i2z = zeros(obj.Nx, obj.Ny);
+            i3y = zeros(obj.Nx, obj.Ny);
 
             for i = 1:obj.Nx
                 for j = 1:obj.Ny
                     I = (i-1)*obj.Ny + j;
-                    [i1x(i,j), i1y(i,j), i2x(i,j), i2y(i,j), i2z(i,j)] = obj.shapes(I).MoA(n);
+                    [i1x(i,j), i1y(i,j), i2x(i,j), i2y(i,j), i2z(i,j), i3y(i,j)] = obj.shapes(I).MoA(n);
                 end
             end
 
@@ -282,6 +283,7 @@ classdef shapespace
             i2xLS = landscape(xgrid', ygrid', i2x);
             i2yLS = landscape(xgrid', ygrid', i2y);
             i2zLS = landscape(xgrid', ygrid', i2z);
+            i3yLS = landscape(xgrid', ygrid', i3y);
         end
 
         % scaled moa landscapes
