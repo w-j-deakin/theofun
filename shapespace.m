@@ -284,6 +284,25 @@ classdef shapespace
             i2zLS = landscape(xgrid', ygrid', i2z);
         end
 
+        % scaled moa landscapes
+        function [i1yLS, i2yLS, i3yLS] = ScaledMoALandscape(obj,n)
+            i1y = zeros(obj.Nx, obj.Ny);
+            i2y = zeros(obj.Nx, obj.Ny);
+            i3y = zeros(obj.Nx, obj.Ny);
+
+            for i = 1:obj.Nx
+                for j = 1:obj.Ny
+                    I = (i-1)*obj.Ny + j;
+                    [i1y(i,j), i2y(i,j), i3y(i,j)] = obj.shapes(I).ScaledMoA(n);
+                end
+            end
+
+            [xgrid,ygrid] = meshgrid(obj.X, obj.Y);
+            i1yLS = landscape(xgrid', ygrid', i1y);
+            i2yLS = landscape(xgrid', ygrid', i2y);
+            i3yLS = landscape(xgrid', ygrid', i3y);
+        end
+
         % muscle attachment landscape
         function [maMLS, ma5LS, ma95LS] = MALandscape(obj,L,alpha,nSamp,LRange,alphaRange)
             xgrid = zeros(obj.Nx, obj.Ny);
