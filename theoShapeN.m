@@ -109,6 +109,7 @@ classdef theoShapeN
                 i2x = nan;
                 i2y = nan;
                 i2z = nan;
+                i3y = nan;
             else
                 [x,y] = obj.draw(n,0,0,1);
                 [~,baseID] = min(x);
