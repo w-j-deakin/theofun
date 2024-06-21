@@ -102,7 +102,7 @@ classdef theoShapeN
 
         % moment of area
 
-        function [i1x, i1y, i2x, i2y, i2z] = MoA(obj, n)
+        function [i1x, i1y, i2x, i2y, i2z, i3y] = MoA(obj, n)
             if (obj.isIntersect)
                 i1x = nan;
                 i1y = nan;
@@ -141,6 +141,7 @@ classdef theoShapeN
                     i1y = i1y + A * (x0 + x1);
                     i2x = i2x + A * (y0*y0 + y0*y1 + y1*y1);
                     i2y = i2y + A * (x0*x0 + x0*x1 + x1*x1);
+                    i3y = i3y + A * ((x0 + x1)^3 + (x0 + x1)*(x1-x0)^2);
                     preI = i;
                 end
                 
@@ -148,8 +149,31 @@ classdef theoShapeN
                 i1y = abs(i1y / 6);
                 i2x = abs(i2x / 12);
                 i2y = abs(i2y / 12);
+                i3y = abs(i3y / 40);
                 i2z = i2x + i2y;
             end
+        end
+
+        % Scaled MoA
+        function [i1y,i2y,i3y] = ScaledMoA(obj, n)
+            [~,i1y,~i2y,~,i3y] = obj.MoA(n);
+            [x, y] = obj.draw(n, 0, 0, 1);
+            [~, baseID] = min(x);
+            [~, tipID] = max(x);
+            [~, a] = findAngle2D([1 0], [(x(tipID) - x(baseID)) (y(tipID) - y(baseID))]);
+
+            if y(tipID) - y(baseID) > 0
+                a = -a;
+            end
+            x = x - x(baseID);
+            y = y - y(baseID);
+            points = Rotate([x y], a);
+            A = polyarea(points(:, 1), points(:, 2));
+            points = points / sqrt(A);
+            L = norm(max(points(:, 1)) - min(points(:, 1)));
+            i1y = (i1y / L);
+            i2y = (i2y / (L^2))^0.5;
+            i3y = (i3y / (L^3))^(1/3);
         end
 
         % Muscle attachment
