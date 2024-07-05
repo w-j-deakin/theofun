@@ -132,6 +132,8 @@ classdef theoShapeN
                 i1y = 0;
                 i2x = 0;
                 i2y = 0;
+                i3y = 0;
+                
                 for i = 1:n
                     x0 = points(preI,1);
                     x1 = points(i,1);
