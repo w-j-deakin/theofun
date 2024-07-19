@@ -159,7 +159,7 @@ classdef theoShapeN
 
         % Scaled MoA
         function [i1y,i2y,i3y] = ScaledMoA(obj, n)
-            [~,i1y,~i2y,~,i3y] = obj.MoA(n);
+            [~,i1y,~,i2y,~,i3y] = obj.MoA(n);
             [x, y] = obj.draw(n, 0, 0, 1);
             [~, baseID] = min(x);
             [~, tipID] = max(x);
